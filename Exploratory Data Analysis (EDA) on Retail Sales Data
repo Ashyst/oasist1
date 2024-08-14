@@ -1,0 +1,53 @@
+import pandas as pd
+
+# Load the datasets
+retail_sales_df = pd.read_csv('/content/retail_sales_dataset.csv')
+menu_df = pd.read_csv('/content/menu.csv')
+
+# Display the first few rows and basic information of each dataset
+retail_sales_info = retail_sales_df.info()
+retail_sales_head = retail_sales_df.head()
+
+menu_info = menu_df.info()
+menu_head = menu_df.head()
+
+(retail_sales_info, retail_sales_head, menu_info, menu_head)
+
+# Convert 'Date' column to datetime format in retail sales dataset
+retail_sales_df['Date'] = pd.to_datetime(retail_sales_df['Date'])
+
+# Check for missing values and ensure data types are correct
+missing_values = retail_sales_df.isnull().sum()
+dtypes = retail_sales_df.dtypes
+
+(missing_values, dtypes)
+
+# Calculate descriptive statistics for key numerical columns
+descriptive_stats = retail_sales_df[['Age', 'Quantity', 'Price per Unit', 'Total Amount']].describe()
+
+# Calculate mode for the numerical columns
+mode_values = retail_sales_df[['Age', 'Quantity', 'Price per Unit', 'Total Amount']].mode().iloc[0]
+
+# Combine the descriptive stats and mode into a summary
+descriptive_stats.loc['mode'] = mode_values
+
+descriptive_stats
+
+# Group by Date and calculate the total sales for each date
+daily_sales = retail_sales_df.groupby('Date')['Total Amount'].sum()
+
+# Calculate the moving average to smooth the time series
+moving_average = daily_sales.rolling(window=7).mean()
+
+# Plot the time series and moving average
+import matplotlib.pyplot as plt
+
+plt.figure(figsize=(12, 6))
+plt.plot(daily_sales, label='Daily Sales')
+plt.plot(moving_average, label='7-Day Moving Average', color='orange')
+plt.title('Daily Sales Over Time')
+plt.xlabel('Date')
+plt.ylabel('Total Sales ($)')
+plt.legend()
+plt.grid(True)
+plt.show()
